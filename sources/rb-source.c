@@ -1407,7 +1407,7 @@ paned_position_changed_cb (GObject *paned, GParamSpec *pspec, GSettings *setting
  * from the source's constructed method.
  *
  * If the browser widget has a browser-views property, it will be bound to the
- * browser-views settings key.
+ * browser-views settings key. The browser-views-use-album-artist property will be bound as well.
  */
 void
 rb_source_bind_settings (RBSource *source, GtkWidget *entry_view, GtkWidget *paned, GtkWidget *browser, gboolean sort_order)
@@ -1450,6 +1450,11 @@ rb_source_bind_settings (RBSource *source, GtkWidget *entry_view, GtkWidget *pan
 
 		if (g_object_class_find_property (G_OBJECT_GET_CLASS (browser), "browser-views")) {
 			g_settings_bind (common_settings, "browser-views", browser, "browser-views", G_SETTINGS_BIND_DEFAULT);
+		}
+
+		if (g_object_class_find_property (G_OBJECT_GET_CLASS (browser), "browser-views-use-album-artist")) {
+			g_settings_bind (common_settings, "browser-views-use-album-artist", browser, "browser-views-use-album-artist",
+				G_SETTINGS_BIND_DEFAULT);
 		}
 	}
 
