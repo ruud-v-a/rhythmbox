@@ -120,6 +120,24 @@
                         <property name="position">2</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkCheckButton" id="library_browser_views_use_album_artist_check">
+                        <property name="label" translatable="yes">Use a_lbum artist instead of artist</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="draw_indicator">True</property>
+                        <property name="group">library_browser_views_radio</property>
+                        <signal name="toggled" handler="rb_shell_preferences_browser_views_use_album_artist_check_changed_cb" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">True</property>

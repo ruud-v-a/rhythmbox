@@ -108,6 +108,7 @@ typedef struct
 
 	GSList *browser_views_group;
 	char *browser_views;
+	gboolean browser_views_use_album_artist;
 
 	GHashTable *property_views;
 	GHashTable *selections;
@@ -122,7 +123,8 @@ enum
 	PROP_INPUT_MODEL,
 	PROP_OUTPUT_MODEL,
 	PROP_ENTRY_TYPE,
-	PROP_BROWSER_VIEWS
+	PROP_BROWSER_VIEWS,
+	PROP_BROWSER_VIEWS_USE_ALBUM_ARTIST
 };
 
 typedef struct {
@@ -132,6 +134,7 @@ typedef struct {
 
 static BrowserPropertyInfo browser_properties[] = {
 	{RHYTHMDB_PROP_GENRE, N_("Genre")},
+	{RHYTHMDB_PROP_ALBUM_ARTIST, N_("Album Artist")},
 	{RHYTHMDB_PROP_ARTIST, N_("Artist")},
 	{RHYTHMDB_PROP_ALBUM, N_("Album")}
 };
@@ -218,6 +221,19 @@ rb_library_browser_class_init (RBLibraryBrowserClass *klass)
 							      "browser view selection",
 							      "artists-albums",
 							      G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+	/**
+	 * RBLibraryBrowser:browser-views-use-album-artist:
+	 *
+	 * Whether to use album artists instead of track artists.
+	 */
+	g_object_class_install_property (object_class,
+					 PROP_BROWSER_VIEWS_USE_ALBUM_ARTIST,
+					 g_param_spec_boolean ("browser-views-use-album-artist",
+							       "browser views use album artist",
+							       "Whether to use album artists instead of track artists",
+							       FALSE,
+							       G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
 	g_type_class_add_private (klass, sizeof (RBLibraryBrowserPrivate));
 }
@@ -341,6 +357,10 @@ rb_library_browser_set_property (GObject *object,
 		priv->browser_views = g_value_dup_string (value);
 		update_browser_views_visibility (RB_LIBRARY_BROWSER (object));
 		break;
+	case PROP_BROWSER_VIEWS_USE_ALBUM_ARTIST:
+		priv->browser_views_use_album_artist = g_value_get_boolean (value);
+		update_browser_views_visibility (RB_LIBRARY_BROWSER (object));
+		break;
 	default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 		break;
@@ -370,6 +390,9 @@ rb_library_browser_get_property (GObject *object,
 		break;
 	case PROP_BROWSER_VIEWS:
 		g_value_set_string (value, priv->browser_views);
+		break;
+	case PROP_BROWSER_VIEWS_USE_ALBUM_ARTIST:
+		g_value_set_boolean (value, priv->browser_views_use_album_artist);
 		break;
 	default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -428,7 +451,10 @@ update_browser_views_visibility (RBLibraryBrowser *widget)
 
 	if (strstr (priv->browser_views, "albums") != NULL)
 		properties = g_list_prepend (properties, (gpointer)RHYTHMDB_PROP_ALBUM);
-	properties = g_list_prepend (properties, (gpointer)RHYTHMDB_PROP_ARTIST);
+	if (priv->browser_views_use_album_artist)
+		properties = g_list_prepend (properties, (gpointer)RHYTHMDB_PROP_ALBUM_ARTIST);
+	else
+		properties = g_list_prepend (properties, (gpointer)RHYTHMDB_PROP_ARTIST);
 	if (strstr (priv->browser_views, "genres") != NULL)
 		properties = g_list_prepend (properties, (gpointer)RHYTHMDB_PROP_GENRE);
 

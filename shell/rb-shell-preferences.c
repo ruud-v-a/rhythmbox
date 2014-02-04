@@ -77,6 +77,8 @@ void rb_shell_preferences_column_check_changed_cb (GtkCheckButton *butt,
 						   RBShellPreferences *shell_preferences);
 void rb_shell_preferences_browser_views_activated_cb (GtkWidget *widget,
 						      RBShellPreferences *shell_preferences);
+void rb_shell_preferences_browser_views_use_album_artist_check_changed_cb (GtkCheckButton* butt,
+									   RBShellPreferences* shell_preferences);
 
 static void column_check_toggled_cb (GtkWidget *widget, RBShellPreferences *preferences);
 
@@ -125,6 +127,7 @@ struct RBShellPreferencesPrivate
 	GtkWidget *playback_prefs_plugin_box;
 
 	GSList *browser_views_group;
+	GtkWidget *browser_views_use_album_artist_check;
 
 	gboolean applying_settings;
 
@@ -243,6 +246,9 @@ rb_shell_preferences_init (RBShellPreferences *shell_preferences)
 		g_slist_reverse (g_slist_copy (gtk_radio_button_get_group
 					       (GTK_RADIO_BUTTON (tmp))));
 
+	shell_preferences->priv->browser_views_use_album_artist_check =
+		GTK_WIDGET (gtk_builder_get_object (builder, "library_browser_views_use_album_artist_check"));
+
 	gtk_notebook_append_page (GTK_NOTEBOOK (shell_preferences->priv->notebook),
 				  GTK_WIDGET (gtk_builder_get_object (builder, "general_vbox")),
 				  gtk_label_new (_("General")));
@@ -256,6 +262,9 @@ rb_shell_preferences_init (RBShellPreferences *shell_preferences)
 				    shell_preferences);
 	source_settings_changed_cb (shell_preferences->priv->source_settings,
 				    "browser-views",
+				    shell_preferences);
+	source_settings_changed_cb (shell_preferences->priv->source_settings,
+				    "browser-views-use-album-artist",
 				    shell_preferences);
 
 	shell_preferences->priv->main_settings = g_settings_new ("org.gnome.rhythmbox");
@@ -500,6 +509,28 @@ rb_shell_preferences_browser_views_activated_cb (GtkWidget *widget,
 	g_settings_set_enum (shell_preferences->priv->source_settings, "browser-views", index);
 }
 
+/**
+ * rb_shell_preferences_browser_views_use_album_artist_check_changed_cb:
+ * @widget: the check button
+ * @shell_preferences: the #RBShellPreferences instance
+ *
+ * Signal handler used for the check button used to configure the
+ * visible browser views, whether to use album artist or artist.
+ */
+void
+rb_shell_preferences_browser_views_use_album_artist_check_changed_cb (GtkCheckButton* widget,
+								      RBShellPreferences *shell_preferences)
+{
+	gboolean use_album_artist;
+
+	if (shell_preferences->priv->applying_settings)
+		return;
+
+	use_album_artist = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+
+	g_settings_set_boolean (shell_preferences->priv->source_settings, "browser-views-use-album-artist", use_album_artist);
+}
+
 static void
 source_settings_changed_cb (GSettings *settings, const char *key, RBShellPreferences *preferences)
 {
@@ -512,6 +543,17 @@ source_settings_changed_cb (GSettings *settings, const char *key, RBShellPrefere
 		preferences->priv->applying_settings = TRUE;
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), TRUE);
 		preferences->priv->applying_settings = FALSE;
+
+	} else if (g_strcmp0 (key, "browser-views-use-album-artist") == 0) {
+		gboolean use_album_artist;
+		GtkWidget* widget;
+
+		use_album_artist = g_settings_get_boolean(preferences->priv->source_settings, "browser-views-use-album-artist");
+		widget = preferences->priv->browser_views_use_album_artist_check;
+		preferences->priv->applying_settings = TRUE;
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), use_album_artist);
+		preferences->priv->applying_settings = FALSE;
+
 
 	} else if (g_strcmp0 (key, "visible-columns") == 0) {
 		char **columns;
