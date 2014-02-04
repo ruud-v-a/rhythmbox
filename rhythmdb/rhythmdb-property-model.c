@@ -132,6 +132,7 @@ static gboolean rhythmdb_property_model_row_draggable (RbTreeDragSource *dragsou
 enum {
 	TARGET_ALBUMS,
 	TARGET_GENRE,
+	TARGET_ALBUM_ARTISTS,
 	TARGET_ARTISTS,
 	TARGET_LOCATION,
 	TARGET_ENTRIES,
@@ -154,6 +155,11 @@ static const GtkTargetEntry targets_artist [] = {
 	{ "application/x-rhythmbox-entry", 0, TARGET_ENTRIES },
 	{ "text/uri-list", 0, TARGET_URIS },
 };
+static const GtkTargetEntry targets_album_artist [] = {
+	{ "text/x-rhythmbox-album-artist", 0, TARGET_ALBUM_ARTISTS },
+	{ "application/x-rhythmbox-entry", 0, TARGET_ENTRIES },
+	{ "text/uri-list", 0, TARGET_URIS },
+};
 static const GtkTargetEntry targets_location [] = {
 	{ "text/x-rhythmbox-location", 0, TARGET_LOCATION },
 	{ "application/x-rhythmbox-entry", 0, TARGET_ENTRIES },
@@ -167,6 +173,7 @@ static const GtkTargetEntry targets_composer [] = {
 
 static GtkTargetList *rhythmdb_property_model_album_drag_target_list = NULL;
 static GtkTargetList *rhythmdb_property_model_artist_drag_target_list = NULL;
+static GtkTargetList *rhythmdb_property_model_album_artist_drag_target_list = NULL;
 static GtkTargetList *rhythmdb_property_model_genre_drag_target_list = NULL;
 static GtkTargetList *rhythmdb_property_model_location_drag_target_list = NULL;
 static GtkTargetList *rhythmdb_property_model_composer_drag_target_list = NULL;
@@ -417,6 +424,12 @@ rhythmdb_property_model_set_property (GObject *object,
 		case RHYTHMDB_PROP_GENRE:
 			append_sort_property (model, RHYTHMDB_PROP_GENRE);
 			break;
+		case RHYTHMDB_PROP_ALBUM_ARTIST:
+			append_sort_property (model, RHYTHMDB_PROP_ALBUM_ARTIST_SORTNAME);
+			append_sort_property (model, RHYTHMDB_PROP_ALBUM_ARTIST);
+			append_sort_property (model, RHYTHMDB_PROP_ARTIST_SORTNAME);
+			append_sort_property (model, RHYTHMDB_PROP_ARTIST);
+			break;
 		case RHYTHMDB_PROP_ARTIST:
 			append_sort_property (model, RHYTHMDB_PROP_ARTIST_SORTNAME);
 			append_sort_property (model, RHYTHMDB_PROP_ARTIST);
@@ -478,6 +491,10 @@ rhythmdb_property_model_get_property (GObject *object,
 static void
 rhythmdb_property_model_init (RhythmDBPropertyModel *model)
 {
+	if (!rhythmdb_property_model_album_artist_drag_target_list)
+		rhythmdb_property_model_album_artist_drag_target_list =
+			gtk_target_list_new (targets_album_artist,
+					     G_N_ELEMENTS (targets_album_artist));
 	if (!rhythmdb_property_model_artist_drag_target_list)
 		rhythmdb_property_model_artist_drag_target_list =
 			gtk_target_list_new (targets_artist,
@@ -1224,6 +1241,9 @@ rhythmdb_property_model_drag_data_get (RbTreeDragSource *dragsource,
 	case RHYTHMDB_PROP_ALBUM:
 		drag_target_list = rhythmdb_property_model_album_drag_target_list;
 		break;
+	case RHYTHMDB_PROP_ALBUM_ARTIST:
+		drag_target_list = rhythmdb_property_model_album_artist_drag_target_list;
+		break;
 	case RHYTHMDB_PROP_ARTIST:
 		drag_target_list = rhythmdb_property_model_artist_drag_target_list;
 		break;
@@ -1393,6 +1413,10 @@ rhythmdb_property_model_enable_drag (RhythmDBPropertyModel *model,
 	case RHYTHMDB_PROP_ALBUM:
 		targets = targets_album;
 		n_elements = G_N_ELEMENTS (targets_album);
+		break;
+	case RHYTHMDB_PROP_ALBUM_ARTIST:
+		targets = targets_album_artist;
+		n_elements = G_N_ELEMENTS (targets_album_artist);
 		break;
 	case RHYTHMDB_PROP_ARTIST:
 		targets = targets_artist;

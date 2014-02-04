@@ -141,6 +141,11 @@
       <summary>Views to show in the library browser.</summary>
       <description>Views to show in the library browser.</description>
     </key>
+    <key name="browser-views-use-album-artist" type="b">
+      <default>false</default>
+      <summary>Use album artist instead of artist.</summary>
+      <description>If true, the artist browser view will show album artists instead of track artists</description>
+    </key>
     <key name="visible-columns" type="as">
       <default>['track-number','artist','album','genre','duration','post-time']</default>
       <summary>List of visible columns.</summary>
