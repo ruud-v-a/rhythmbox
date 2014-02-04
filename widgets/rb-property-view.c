@@ -658,6 +658,7 @@ rb_property_view_cell_data_func (GtkTreeViewColumn *column,
 
 		switch (view->priv->propid) {
 		case RHYTHMDB_PROP_ARTIST:
+		case RHYTHMDB_PROP_ALBUM_ARTIST:
 			fmt = ngettext ("%d artist (%d)", "All %d artists (%d)", nodes);
 			break;
 		case RHYTHMDB_PROP_ALBUM:
