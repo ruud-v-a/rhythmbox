@@ -1,3 +1,23 @@
+About This Fork
+===============
+This repository is a mirror of the official Rhythmbox repository, with a single
+patch applied: it adds support for browsing by album artist, instead of artist,
+in the browser view, which is a desired feature when your artist tags contain
+e.g. featured artists.
+
+I did submit this patch to the GNOME bugzilla in 2012:
+  https://bugzilla.gnome.org/show_bug.cgi?id=678706
+
+There seems to be no intention to merge this patch, neither to support browsing
+by album artist in another way. Therefore, I am making a patched version
+available as a repository, so that people who do want album artist support can
+clone and build without going through the trouble of applying the patch
+manually. I intend to add a patched version for every new Rhythmbox release.
+For example, the tag `v3.1` is the official Rhythmbox 3.1, and
+`v3.1-album-artist` is the patched version.
+
+What follows below is the original readme.
+
 General Information
 ===================
 
