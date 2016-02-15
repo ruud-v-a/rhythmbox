@@ -132,7 +132,6 @@
                         <property name="use_action_appearance">False</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
-                        <property name="group">library_browser_views_radio</property>
                         <signal name="toggled" handler="rb_shell_preferences_browser_views_use_album_artist_check_changed_cb" swapped="no"/>
                       </object>
                       <packing>
